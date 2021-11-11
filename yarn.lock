@@ -87,6 +87,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.9.2":
+  version: 7.16.3
+  resolution: "@babel/runtime@npm:7.16.3"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: ab8ac887096d76185ddbf291d28fb976cd32473696dc497ad4905b784acbd5aa462533ad83a5c5104e10ead28c2e0e119840ee28ed8eff90dcdde9d57f916eda
+  languageName: node
+  linkType: hard
+
 "@babel/types@npm:7.15.0":
   version: 7.15.0
   resolution: "@babel/types@npm:7.15.0"
@@ -1422,6 +1431,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@reduxjs/toolkit@npm:^1.6.2":
+  version: 1.6.2
+  resolution: "@reduxjs/toolkit@npm:1.6.2"
+  dependencies:
+    immer: ^9.0.6
+    redux: ^4.1.0
+    redux-thunk: ^2.3.0
+    reselect: ^4.0.0
+  peerDependencies:
+    react: ^16.14.0 || ^17.0.0
+    react-redux: ^7.2.1
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-redux:
+      optional: true
+  checksum: 895e30518dd1552c115c8a06091856f1f60394a971d214eba5c6d7fc2053c5bc2730bc172ba88aead25d240e99a25c94c3621159823bbc0d0109dc9365db456d
+  languageName: node
+  linkType: hard
+
 "@rushstack/eslint-patch@npm:^1.0.6":
   version: 1.0.9
   resolution: "@rushstack/eslint-patch@npm:1.0.9"
@@ -1433,6 +1462,16 @@ __metadata:
   version: 1.1.2
   resolution: "@tootallnate/once@npm:1.1.2"
   checksum: e1fb1bbbc12089a0cb9433dc290f97bddd062deadb6178ce9bcb93bb7c1aecde5e60184bc7065aec42fe1663622a213493c48bbd4972d931aae48315f18e1be9
+  languageName: node
+  linkType: hard
+
+"@types/hoist-non-react-statics@npm:^3.3.0":
+  version: 3.3.1
+  resolution: "@types/hoist-non-react-statics@npm:3.3.1"
+  dependencies:
+    "@types/react": "*"
+    hoist-non-react-statics: ^3.3.0
+  checksum: 2c0778570d9a01d05afabc781b32163f28409bb98f7245c38d5eaf082416fdb73034003f5825eb5e21313044e8d2d9e1f3fe2831e345d3d1b1d20bcd12270719
   languageName: node
   linkType: hard
 
@@ -1477,6 +1516,29 @@ __metadata:
   version: 15.7.4
   resolution: "@types/prop-types@npm:15.7.4"
   checksum: ef6e1899e59b876c273811b1bd845022fc66d5a3d11cb38a25b6c566b30514ae38fe20a40f67622f362a4f4f7f9224e22d8da101cff3d6e97e11d7b4c307cfc1
+  languageName: node
+  linkType: hard
+
+"@types/react-redux@npm:^7.1.20":
+  version: 7.1.20
+  resolution: "@types/react-redux@npm:7.1.20"
+  dependencies:
+    "@types/hoist-non-react-statics": ^3.3.0
+    "@types/react": "*"
+    hoist-non-react-statics: ^3.3.0
+    redux: ^4.0.0
+  checksum: 5e0405d0d312f1b5e2dd48ab5833d3226295931fe8d276bd0891fafe4dd7ba9efbc74b1e8b30685ba96e9dc1a63d57444ae335785ce6fda96900d5fc9f800dcf
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:*":
+  version: 17.0.34
+  resolution: "@types/react@npm:17.0.34"
+  dependencies:
+    "@types/prop-types": "*"
+    "@types/scheduler": "*"
+    csstype: ^3.0.2
+  checksum: 16729ad7d50922ccbf8eb93874d7781dc2f1c64edc78134b5edc7154839d41e9fe320eb1c11ad2d1c9bf28b99cb1febda344509c1fda025955a5c2b43c688c8f
   languageName: node
   linkType: hard
 
@@ -3481,7 +3543,7 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"hoist-non-react-statics@npm:^3.3.1":
+"hoist-non-react-statics@npm:^3.3.0, hoist-non-react-statics@npm:^3.3.1, hoist-non-react-statics@npm:^3.3.2":
   version: 3.3.2
   resolution: "hoist-non-react-statics@npm:3.3.2"
   dependencies:
@@ -3603,6 +3665,13 @@ fsevents@~2.3.1:
   bin:
     image-size: bin/image-size.js
   checksum: 2d9d1edc43c0fa8effd27c44cd2d1b02ecc963219e78a76ac80b9d363f69c5aa19990cc23a323959ea510742ff07667e231f0852fd57eba5dc5b55432b58106d
+  languageName: node
+  linkType: hard
+
+"immer@npm:^9.0.6":
+  version: 9.0.6
+  resolution: "immer@npm:9.0.6"
+  checksum: 75da22f3b32f3f14604eb389b4f50e84a14f2e42f306f0cbe4d2969aed54ec7fda9a7e9ca42ebae2ba73ec9bb6ec1001fafbac535accaf03860054ab0f7e8388
   languageName: node
   linkType: hard
 
@@ -4349,8 +4418,10 @@ fsevents@~2.3.1:
     "@emotion/react": ^11
     "@emotion/styled": ^11
     "@fontsource/poppins": ^4.5.0
+    "@reduxjs/toolkit": ^1.6.2
     "@types/node": 16.11.6
     "@types/react": 17.0.33
+    "@types/react-redux": ^7.1.20
     eslint: 7
     eslint-config-next: 12.0.1
     focus-visible: ^5.2.0
@@ -4360,6 +4431,7 @@ fsevents@~2.3.1:
     next-seo: ^4.28.1
     react: 17.0.2
     react-dom: 17.0.2
+    react-redux: ^7.2.6
     typescript: 4.4.4
   languageName: unknown
   linkType: soft
@@ -5083,7 +5155,7 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"react-is@npm:17.0.2":
+"react-is@npm:17.0.2, react-is@npm:^17.0.2":
   version: 17.0.2
   resolution: "react-is@npm:17.0.2"
   checksum: 9d6d111d8990dc98bc5402c1266a808b0459b5d54830bbea24c12d908b536df7883f268a7868cfaedde3dd9d4e0d574db456f84d2e6df9c4526f99bb4b5344d8
@@ -5094,6 +5166,27 @@ fsevents@~2.3.1:
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
   checksum: f7a19ac3496de32ca9ae12aa030f00f14a3d45374f1ceca0af707c831b2a6098ef0d6bdae51bd437b0a306d7f01d4677fcc8de7c0d331eb47ad0f46130e53c5f
+  languageName: node
+  linkType: hard
+
+"react-redux@npm:^7.2.6":
+  version: 7.2.6
+  resolution: "react-redux@npm:7.2.6"
+  dependencies:
+    "@babel/runtime": ^7.15.4
+    "@types/react-redux": ^7.1.20
+    hoist-non-react-statics: ^3.3.2
+    loose-envify: ^1.4.0
+    prop-types: ^15.7.2
+    react-is: ^17.0.2
+  peerDependencies:
+    react: ^16.8.3 || ^17
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 0bf142ce0d0b80aef955650fd5e9489fca32d94f19ee23893b332f1b01ceee7bd3623337c942cbda642667d1dc9de5ac869c3c1946afa6cf2046407b57d24741
   languageName: node
   linkType: hard
 
@@ -5217,6 +5310,24 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
+"redux-thunk@npm:^2.3.0":
+  version: 2.4.0
+  resolution: "redux-thunk@npm:2.4.0"
+  peerDependencies:
+    redux: ^4
+  checksum: 250cd88087bb4614052a5175fd6bd4c70b6a4479c357af8628b3a1d5f75d5b0a6c01645acc3257d3ed147a949708dd748a50b00402d548c3331038ed4f296edc
+  languageName: node
+  linkType: hard
+
+"redux@npm:^4.0.0, redux@npm:^4.1.0":
+  version: 4.1.2
+  resolution: "redux@npm:4.1.2"
+  dependencies:
+    "@babel/runtime": ^7.9.2
+  checksum: 6a839cee5bd580c5298d968e9e2302150e961318253819bcd97f9d945a5a409559eacddf6026f4118bb68b681c593d90e8a2c5bbf278f014aff9bf0d2d8fa084
+  languageName: node
+  linkType: hard
+
 "regenerator-runtime@npm:0.13.4":
   version: 0.13.4
   resolution: "regenerator-runtime@npm:0.13.4"
@@ -5252,6 +5363,13 @@ fsevents@~2.3.1:
   version: 2.0.2
   resolution: "require-from-string@npm:2.0.2"
   checksum: a03ef6895445f33a4015300c426699bc66b2b044ba7b670aa238610381b56d3f07c686251740d575e22f4c87531ba662d06937508f0f3c0f1ddc04db3130560b
+  languageName: node
+  linkType: hard
+
+"reselect@npm:^4.0.0":
+  version: 4.1.2
+  resolution: "reselect@npm:4.1.2"
+  checksum: 5a702af37e7fa5e58e8b0787b8a1668df2eff527f1eb2cb2bd81416db6947064a922b41f28a522016df6e5e2dbc5f8588ff0749dcf3c06daae0e0cc3baffec99
   languageName: node
   linkType: hard
 
