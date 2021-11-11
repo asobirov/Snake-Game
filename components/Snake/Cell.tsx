@@ -8,7 +8,14 @@ type CellProps = {
 
 const Cell = ({ type, idx }: CellProps) => {
     return (
-        <Box w='10px' h='10px' data-coords={idx} bg={type === 'snake' ? 'gray.500' : type === 'food' ? 'orange' : 'black'} datatype={type} />
+        <Box
+            w='10px'
+            h='10px'
+            data-coords={idx}
+            bg={type === 'snake' ? 'gray.500' : type === 'food' ? 'orange' : 'black'}
+            data-type={type}
+            borderRadius={type === 'food' ? 'md' : 'sm'}
+        />
     )
 }
 

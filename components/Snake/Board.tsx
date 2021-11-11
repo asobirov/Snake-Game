@@ -42,7 +42,7 @@ const Board = () => {
 
     const [grid, setGrid] = useState<TCell[][] | null>(null);
     const [size, setSize] = useState<number>(50);
-    const [speed, setSpeed] = useState<number>(1500);
+    const [speed, setSpeed] = useState<number>(100);
 
     const [start, setStart] = useState(false);
     const [lost, setLost] = useState(false);
@@ -318,7 +318,7 @@ const Board = () => {
                     <DrawerHeader
                         display='flex'
                         flexDirection='row'
-                        alignItems='space-between'
+                        alignItems='center'
                         justifyContent='space-between'
                     >
                         Board states:<DrawerCloseButton size='lg' icon={<Cancel />} pos='unset' />
