@@ -7,8 +7,8 @@ const Home: NextPage = () => {
     <Flex
       align='center'
       justify='center'
-      direction='column'
-      minH='100vh'>
+      minH='100vh'
+      >
       <Board />
     </Flex>
   )

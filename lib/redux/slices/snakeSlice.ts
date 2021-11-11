@@ -25,7 +25,11 @@ const snakeSlice = createSlice({
   name: "snake",
   initialState,
   reducers: {
-    moveSnake(state, action: PayloadAction<TCell | undefined>) {
+    moveSnake(
+      state,
+      action: PayloadAction<{ cell: TCell | undefined; max: number }>
+    ) {
+      const { cell, max } = action.payload;
       let head = { ...state.snake[state.snake.length - 1] };
       switch (state.direction) {
         case "right":
@@ -45,9 +49,9 @@ const snakeSlice = createSlice({
           break;
       }
       state.head = head;
-      if (!(head.x < 0 || head.y < 0)) {
+      if (!(head.x < 0 || head.y < 0) && !(head.x >= max || head.y >= max)) {
         state.snake.push(head);
-        if (action.payload !== "food") {
+        if (cell !== "food") {
           state.tail = state.snake.shift();
         }
       }

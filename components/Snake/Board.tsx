@@ -1,40 +1,51 @@
 import { useState, useEffect, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux";
 
-import { Grid, Button, IconButton, Stack, Flex, NumberInputField, NumberInput, NumberInputStepper, NumberDecrementStepper, NumberIncrementStepper, Slider, SliderFilledTrack, SliderTrack, SliderThumb } from "@chakra-ui/react"
+import {
+    Grid,
+    Button,
+    Code,
+    IconButton,
+    Stack,
+    Flex,
+    NumberInputField,
+    NumberInput,
+    NumberInputStepper,
+    NumberDecrementStepper,
+    NumberIncrementStepper,
+    Drawer,
+    DrawerBody,
+    DrawerHeader,
+    DrawerOverlay,
+    DrawerContent,
+    DrawerCloseButton,
+    useDisclosure,
+} from "@chakra-ui/react"
 import Cell from "./Cell"
-import { TCell, TDirection } from "../../types";
+import { TCell, TCoordinates, TDirection } from "../../types";
 import { spawnFood } from "../../lib/redux/slices/foodSlice";
 import { AppState } from "../../lib/redux/store";
 import { moveSnake, resetSnake, setDirection } from "../../lib/redux/slices/snakeSlice";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from "iconoir-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, FingerprintCircled, Cancel } from "iconoir-react";
 
 const Board = () => {
+    const { isOpen, onOpen, onClose } = useDisclosure()
+
     const dispatch = useDispatch();
 
     const food = useSelector((state: AppState) => state.food);
     const foodRef = useRef(food)
     const { snake, tail, head, direction } = useSelector((state: AppState) => state.snake);
+    const snakeRef = useRef(snake);
     const headRef = useRef(head);
     const direactionRef = useRef(direction);
 
     const [grid, setGrid] = useState<TCell[][] | null>(null);
     const [size, setSize] = useState<number>(50);
-    const [speed, setSpeed] = useState<number>(369);
+    const [speed, setSpeed] = useState<number>(1500);
 
     const [start, setStart] = useState(false);
     const [lost, setLost] = useState(false);
-
-    useEffect(() => {
-        // return () => {
-        //     dispatch(resetSnake());
-        // }
-    }, [])
-
-    useEffect(() => {
-        headRef.current = head;
-        foodRef.current = food;
-    }, [head, food])
 
     const addFood = (_grid: TCell[][]) => {
         dispatch(spawnFood({ max: size }));
@@ -79,10 +90,13 @@ const Board = () => {
 
 
     useEffect(() => {
+        snakeRef.current = snake;
+        headRef.current = head;
+        foodRef.current = food;
         if (!lost) {
             updateGrid();
         }
-    }, [snake]);
+    }, [snake, food, head]);
 
     const handleDirectionChange = (dir: TDirection) => {
         dispatch(setDirection(dir));
@@ -121,24 +135,44 @@ const Board = () => {
         alert(`You lost!:( \nReason: ${reason || 'UNKOWN'}`);
     }
 
+    const checkSelfCannibalism = (snake: TCoordinates[]) => {
+        let hash: any = {};
+        let hasDuplicate = false;
+        snake.forEach((val) => {
+            if (hash[val.x.toString()] === val.y) {
+                hasDuplicate = true;
+                return;
+            }
+            hash[val.x.toString()] = val.y;
+        });
+        console.log(hash);
+        return hasDuplicate;
+    }
+
     const handleMoveSnake = () => {
+        if (lost) {
+            return;
+        }
+        const snake = snakeRef.current;
         const head = headRef.current;
         const food = foodRef.current;
+
+
         if (head.x < 0 || head.y < 0) {
             endGame(`head(${JSON.stringify(head)}) <= 0`);
             return;
         }
-        if (head.x >= size - 1 || head.y >= size - 1) {
-            endGame('head >= size - 1 ');
+        if (head.x >= size || head.y >= size) {
+            endGame('head >= size');
             return;
         }
         if (head.x === food.x && head.y === food.y) {
-            console.log('YUMMMY');
             dispatch(spawnFood({ max: size }));
-            dispatch(moveSnake("food"));
+            dispatch(moveSnake({ cell: "food", max: size }));
             return;
         }
-        dispatch(moveSnake());
+
+        dispatch(moveSnake({ cell: undefined, max: size }));
     }
 
     useEffect(() => {
@@ -163,7 +197,12 @@ const Board = () => {
     }
 
     return (
-        <>
+        <Stack
+            direction='row'
+            spacing={10}
+            w='full'
+            justify='center'
+        >
             <Grid
                 templateColumns={`repeat(${size}, 1fr)`}
                 templateRows={`repeat(${size}, 1fr)`}
@@ -183,12 +222,11 @@ const Board = () => {
                     ))
                 })}
             </Grid>
-            {JSON.stringify(snake)}
-            {JSON.stringify(food)}
             <Stack
-                direction='row'
-                spacing='12'
+                direction='column'
+                spacing='16'
                 align='center'
+                justify='flex-end'
                 mt={6}>
                 <Stack
                     shouldWrapChildren
@@ -214,6 +252,7 @@ const Board = () => {
                 <Stack>
                     <Flex justify='center'>
                         <IconButton
+                            size='lg'
                             onClick={() => handleKeyDown({ key: 'ArrowUp' })}
                             aria-label='up'
                             isActive={direction === 'up'}
@@ -223,6 +262,7 @@ const Board = () => {
                     </Flex>
                     <Stack direction='row'>
                         <IconButton
+                            size='lg'
                             onClick={() => handleKeyDown({ key: 'ArrowLeft' })}
                             aria-label='left'
                             isActive={direction === 'left'}
@@ -230,6 +270,7 @@ const Board = () => {
                             icon={<ArrowLeft />}
                         />
                         <IconButton
+                            size='lg'
                             onClick={() => handleKeyDown({ key: 'ArrowDown' })}
                             aria-label='down'
                             isActive={direction === 'down'}
@@ -237,6 +278,7 @@ const Board = () => {
                             icon={<ArrowDown />}
                         />
                         <IconButton
+                            size='lg'
                             onClick={() => handleKeyDown({ key: 'ArrowRight' })}
                             aria-label='right'
                             isActive={direction === 'right'}
@@ -245,7 +287,7 @@ const Board = () => {
                         />
                     </Stack>
                 </Stack>
-                <Stack>
+                <Stack direction='row'>
                     <Button
                         onClick={() => setStart(!start)}
                         minW={24}
@@ -262,7 +304,37 @@ const Board = () => {
                     </Button>
                 </Stack>
             </Stack>
-        </>
+            <IconButton
+                aria-label='Open Grid States'
+                pos='fixed'
+                top={6}
+                right={6}
+                icon={<FingerprintCircled />}
+                onClick={onOpen}
+            />
+            <Drawer isOpen={isOpen} placement='right' onClose={onClose}>
+                <DrawerOverlay />
+                <DrawerContent bg='black' py={2}>
+                    <DrawerHeader
+                        display='flex'
+                        flexDirection='row'
+                        alignItems='space-between'
+                        justifyContent='space-between'
+                    >
+                        Board states:<DrawerCloseButton size='lg' icon={<Cancel />} pos='unset' />
+                    </DrawerHeader>
+                    <DrawerBody>
+                        <Stack direction='row' spacing={10} mt={6}>
+                            <Code p={3} colorScheme='black'>
+                                Food: {JSON.stringify(food)}
+                                <br />
+                                Snake: {JSON.stringify(snake)}
+                            </Code>
+                        </Stack>
+                    </DrawerBody>
+                </DrawerContent>
+            </Drawer>
+        </Stack >
     )
 }
 
