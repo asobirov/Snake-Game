@@ -37,6 +37,11 @@ const components = {
             transition: 'padding .8s ease-in-out, max-width .8s ease'
         }
     },
+    Button: {
+        baseStyle: {
+            _focus: { boxShadow: 'none' }
+        }
+    }
 }
 
 const overrides = {}
