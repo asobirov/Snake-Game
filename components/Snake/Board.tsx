@@ -13,7 +13,7 @@ const Board = () => {
     const dispatch = useDispatch();
 
     const food = useSelector((state: AppState) => state.food);
-
+    const foodRef = useRef(food)
     const { snake, tail, head, direction } = useSelector((state: AppState) => state.snake);
     const headRef = useRef(head);
     const direactionRef = useRef(direction);
@@ -33,8 +33,8 @@ const Board = () => {
 
     useEffect(() => {
         headRef.current = head;
-    }, [head])
-
+        foodRef.current = food;
+    }, [head, food])
 
     const addFood = (_grid: TCell[][]) => {
         dispatch(spawnFood({ max: size }));
@@ -123,7 +123,7 @@ const Board = () => {
 
     const handleMoveSnake = () => {
         const head = headRef.current;
-
+        const food = foodRef.current;
         if (head.x < 0 || head.y < 0) {
             endGame(`head(${JSON.stringify(head)}) <= 0`);
             return;
@@ -132,8 +132,6 @@ const Board = () => {
             endGame('head >= size - 1 ');
             return;
         }
-
-        console.log('head:', head, 'food:', food);
         if (head.x === food.x && head.y === food.y) {
             console.log('YUMMMY');
             dispatch(spawnFood({ max: size }));
