@@ -1,43 +1,66 @@
-import { useState, useEffect } from "react"
-import { Grid } from "@chakra-ui/react"
-import Cell, { TBlockTypes } from "./Cell"
+import { useState, useEffect, useCallback } from "react"
+import { useDispatch, useSelector } from "react-redux";
 
-type Coordinates = {
-    x: number,
-    y: number
-}
-type Direction = 'up' | 'down' | 'left' | 'right';
+import { Grid, Button, IconButton, Stack, Flex, NumberInputField, NumberInput, NumberInputStepper, NumberDecrementStepper, NumberIncrementStepper, Slider, SliderFilledTrack, SliderTrack, SliderThumb } from "@chakra-ui/react"
+import Cell from "./Cell"
+import { TCell, TDirection } from "../../types";
+import { spawnFood } from "../../lib/redux/slices/foodSlice";
+import { AppState } from "../../lib/redux/store";
+import { moveSnake, resetSnake, setDirection } from "../../lib/redux/slices/snakeSlice";
+import { ArrowDown, ArrowUp } from "iconoir-react";
 
 const Board = () => {
+    const dispatch = useDispatch();
+
+    const food = useSelector((state: AppState) => state.food);
+    const { snake, tail } = useSelector((state: AppState) => state.snake);
+
+
+    const [grid, setGrid] = useState<TCell[][] | null>(null);
     const [size, setSize] = useState<number>(50);
-    const [speed, setSpeed] = useState<number>(200);
+    const [speed, setSpeed] = useState<number>(500);
 
-    const getRandomCoordinates = (max: number = size - 1): Coordinates => {
-        let min = Math.ceil(0);
-        max = Math.floor(max);
-        return {
-            x: Math.floor(Math.random() * (max - min + 1) + min),
-            y: Math.floor(Math.random() * (max - min + 1) + min)
+    useEffect(() => {
+        return () => {
+            console.log('RESET');
+            dispatch(resetSnake());
         }
+    }, [])
+
+    const updateGrid = () => {
+        let _grid: TCell[][]
+        if (!grid) {
+            _grid = Array.from({ length: size }, () => Array.from({ length: size }, () => "blank"))
+
+            dispatch(spawnFood({ max: size }));
+            _grid[food.x][food.y] = 'food';
+
+            const snake = [{ x: 0, y: 0 }, { x: 1, y: 0 }];
+            snake.forEach(cell => {
+                _grid[cell.x][cell.y] = 'snake'
+            })
+        } else {
+            _grid = JSON.parse(JSON.stringify(grid));
+
+            _grid[food.x][food.y] = 'food';
+
+            snake.forEach(cell => {
+                _grid[cell.x][cell.y] = 'snake'
+            });
+            _grid[tail!.x][tail!.y] = 'blank'
+        }
+        setGrid(_grid);
     }
-    const [food, setFood] = useState<Coordinates>(getRandomCoordinates)
 
-    const initBoard = () => {
-        const _board: TBlockTypes[][] = Array.from({ length: size }, () => Array.from({ length: size }, () => "blank"));
 
-        const snake = [{ x: 0, y: 0 }, { x: 1, y: 0 }];
+    useEffect(() => {
+        updateGrid();
+    }, [snake]);
 
-        _board[food.x][food.y] = 'food'
-        snake.forEach(cell => {
-            _board[cell.x][cell.y] = 'snake'
-        })
-
-        return _board
+    const handleDirectionChange = (dir: TDirection) => {
+        console.log(dir);
+        dispatch(setDirection(dir));
     }
-    const [board, setBoard] = useState<TBlockTypes[][]>(initBoard);
-
-    const [snake, setSnake] = useState<Coordinates[]>(() => [{ x: 0, y: 0 }, { x: 1, y: 0 }]);
-    const [direction, setDirection] = useState<Direction>('right');
 
     const handleKeyDown = (e: any) => {
         const key = e.keyCode;
@@ -45,98 +68,64 @@ const Board = () => {
         switch (key) {
 
             case 40:
-                setDirection('down');
+                handleDirectionChange('down');
                 break;
             case 39:
-                setDirection('right');
+                handleDirectionChange('right');
                 break;
             case 38:
-                setDirection('up');
+                handleDirectionChange('up');
                 break;
             case 37:
-                setDirection('left');
+                handleDirectionChange('left');
                 break;
-
         }
     }
 
-    useEffect(() => {
-        window.addEventListener('keydown', handleKeyDown);
-    }, [])
-
-    const moveSnake = () => {
-        const _snake: Coordinates[] = [...snake];
-        let head = _snake[_snake.length - 1];
-
-        switch (direction) {
-            case 'right':
-                head = { x: head.x + 1, y: head.y };
-                break;
-
-            case 'left':
-                head = { x: head.x - 1, y: head.y }
-                break;
-
-            case 'up':
-                head = { x: head.x, y: head.y - 1 }
-                break;
-
-            case 'down':
-                head = { x: head.x, y: head.y + 1 }
-                break;
-
-        }
-        _snake.push(head);
-        const tail = _snake.shift()!;
-        setSnake(_snake);
-
-        const _board = [...board];
-        _board[tail.x][tail.y] = 'blank'
-        setBoard(_board);
-    }
+    const [start, setStart] = useState(false);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            moveSnake();
-        }, speed);
-        return () => clearInterval(interval)
-    }, [snake])
+        let interval: any;
 
-    const updateBoard = ({ snake, food }: { snake?: Coordinates[], food?: Coordinates }) => {
-        const _board = board;
+        if (start) {
+            interval = setInterval(() => {
+                dispatch(moveSnake());
+            }, speed)
+            window.addEventListener('keydown', handleKeyDown);
 
-        if (food) {
-            _board[food.x][food.y] = 'food'
+        } else {
+            clearInterval(interval);
+            window.removeEventListener('keydown', handleKeyDown);
         }
 
-        if (snake) {
-            snake.forEach(cell => {
-                _board[cell.x][cell.y] = 'snake'
-            })
-        }
-        return _board;
-    }
+        return () => clearInterval(interval);
+    }, [start, speed]);
 
-    useEffect(() => {
-        setBoard(updateBoard({ snake }));
-    }, [snake])
     return (
-        <Grid
-            templateColumns={`repeat(${size}, 1fr)`}
-            templateRows={`repeat(${size}, 1fr)`}
-            gap='2px'
-            p='8px'
-            border='1px'
-            w='min-content'
-            borderColor='whiteAlpha.700'
-            gridAutoFlow='column'
-        >
-            {board.map((column, rK) => {
-                return column.map((cell, key) => (
-                    <Cell key={key} idx={`${rK}:${key}`} type={cell} />
-                ))
-            })}
-        </Grid>
+        <>
+            <Grid
+                templateColumns={`repeat(${size}, 1fr)`}
+                templateRows={`repeat(${size}, 1fr)`}
+                gap='2px'
+                p='8px'
+                border='1px'
+                w='min-content'
+                borderColor='whiteAlpha.700'
+                gridAutoFlow='column'
+            >
+                {grid && grid.map((column, rK) => {
+                    return column.map((cell, key) => (
+                        <Cell key={key} idx={`${rK}:${key}`} type={cell} />
+                    ))
+                })}
+            </Grid>
+            <Stack direction='row' spacing='12' mt={6}>
+                <Button onClick={() => setStart(!start)}>{start ? 'Stop' : 'Start'}</Button>
+                <Stack>
+                    <IconButton onClick={() => handleDirectionChange('down')} aria-label='up' icon={<ArrowDown />} />
+                </Stack>
+            </Stack>
+        </>
     )
 }
 
