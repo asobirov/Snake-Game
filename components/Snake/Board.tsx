@@ -198,10 +198,11 @@ const Board = () => {
 
     return (
         <Stack
-            direction='row'
+            direction={{ base: 'column', lg: 'row' }}
             spacing={10}
             w='full'
             justify='center'
+            align={{ base: "center", lg: 'flex-end' }}
         >
             <Grid
                 templateColumns={`repeat(${size}, 1fr)`}
@@ -223,7 +224,7 @@ const Board = () => {
                 })}
             </Grid>
             <Stack
-                direction='column'
+                direction={{ base: 'row', lg: 'column' }}
                 spacing='16'
                 align='center'
                 justify='flex-end'
@@ -248,6 +249,22 @@ const Board = () => {
                             <NumberDecrementStepper />
                         </NumberInputStepper>
                     </NumberInput>
+                </Stack>
+                <Stack direction='row'>
+                    <Button
+                        onClick={() => setStart(!start)}
+                        minW={24}
+                        disabled={lost}
+                        colorScheme={start ? 'red' : 'gray'}
+                    >
+                        {start ? 'Stop' : 'Start'}
+                    </Button>
+                    <Button
+                        onClick={() => reset()}
+                        minW={24}
+                    >
+                        Reset
+                    </Button>
                 </Stack>
                 <Stack>
                     <Flex justify='center'>
@@ -286,22 +303,6 @@ const Board = () => {
                             icon={<ArrowRight />}
                         />
                     </Stack>
-                </Stack>
-                <Stack direction='row'>
-                    <Button
-                        onClick={() => setStart(!start)}
-                        minW={24}
-                        disabled={lost}
-                        colorScheme={start ? 'red' : 'gray'}
-                    >
-                        {start ? 'Stop' : 'Start'}
-                    </Button>
-                    <Button
-                        onClick={() => reset()}
-                        minW={24}
-                    >
-                        Reset
-                    </Button>
                 </Stack>
             </Stack>
             <IconButton
