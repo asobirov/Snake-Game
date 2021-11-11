@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { TCoordinates, TDirection } from "../../../types";
+import { TCell, TCoordinates, TDirection } from "../../../types";
 
 type TOffset = {
   x: number;
@@ -8,6 +8,7 @@ type TOffset = {
 
 const initialState: {
   snake: TCoordinates[];
+  head: TCoordinates;
   tail: TCoordinates | undefined;
   direction: TDirection;
 } = {
@@ -15,6 +16,7 @@ const initialState: {
     { x: 0, y: 0 },
     { x: 1, y: 0 },
   ],
+  head: { x: 1, y: 0 },
   tail: undefined,
   direction: "right",
 };
@@ -23,9 +25,8 @@ const snakeSlice = createSlice({
   name: "snake",
   initialState,
   reducers: {
-    moveSnake(state) {
+    moveSnake(state, action: PayloadAction<TCell | undefined>) {
       let head = { ...state.snake[state.snake.length - 1] };
-      console.log("Move to", state.direction);
       switch (state.direction) {
         case "right":
           head = { x: head.x + 1, y: head.y };
@@ -43,21 +44,25 @@ const snakeSlice = createSlice({
           head = { x: head.x, y: head.y + 1 };
           break;
       }
-      state.snake.push(head);
-      state.tail = state.snake.shift();
-    },
-    resetSnake(state) {
-      state = {
-        snake: [
-          { x: 0, y: 0 },
-          { x: 1, y: 0 },
-        ],
-        tail: undefined,
-        direction: "right",
-      };
+      state.head = head;
+      if (!(head.x < 0 || head.y < 0)) {
+        state.snake.push(head);
+        if (action.payload !== "food") {
+          state.tail = state.snake.shift();
+        }
+      }
     },
     setDirection(state, action: PayloadAction<TDirection>) {
       state.direction = action.payload;
+    },
+    resetSnake(state) {
+      state.snake = [
+        { x: 0, y: 0 },
+        { x: 1, y: 0 },
+      ];
+      state.head = { x: 1, y: 0 };
+      state.tail = undefined;
+      state.direction = "right";
     },
   },
 });

@@ -13,49 +13,75 @@ const Board = () => {
     const dispatch = useDispatch();
 
     const food = useSelector((state: AppState) => state.food);
-    const { snake, tail, direction } = useSelector((state: AppState) => state.snake);
+
+    const { snake, tail, head, direction } = useSelector((state: AppState) => state.snake);
+    const headRef = useRef(head);
     const direactionRef = useRef(direction);
 
     const [grid, setGrid] = useState<TCell[][] | null>(null);
     const [size, setSize] = useState<number>(50);
-    const [speed, setSpeed] = useState<number>(500);
+    const [speed, setSpeed] = useState<number>(1000);
 
     const [start, setStart] = useState(false);
+    const [lost, setLost] = useState(false);
 
     useEffect(() => {
-        return () => {
-            console.log('RESET');
-            dispatch(resetSnake());
-        }
+        // return () => {
+        //     dispatch(resetSnake());
+        // }
     }, [])
+
+    useEffect(() => {
+        headRef.current = head;
+    }, [head])
+
+
+    const addFood = (_grid: TCell[][]) => {
+        dispatch(spawnFood({ max: size }));
+        _grid[food.x][food.y] = 'food';
+
+        return _grid
+    }
+
+    const initGrid = (): TCell[][] => {
+        console.log('INIT');
+
+        let _grid: TCell[][] = Array.from({ length: size }, () => Array.from({ length: size }, () => "blank"))
+
+        // dispatch(spawnFood({ max: size }));
+        _grid[food.x][food.y] = 'food';
+
+        // snake.forEach(cell => {  // FIX: Hardcoded, snake is falling one step behind
+        [{ x: 0, y: 0 }, { x: 1, y: 0 }].forEach(cell => {
+            _grid[cell.x][cell.y] = 'snake'
+        })
+
+        return _grid
+    }
 
     const updateGrid = () => {
         let _grid: TCell[][]
         if (!grid) {
-            _grid = Array.from({ length: size }, () => Array.from({ length: size }, () => "blank"))
-
-            dispatch(spawnFood({ max: size }));
-            _grid[food.x][food.y] = 'food';
-
-            snake.forEach(cell => {
-                _grid[cell.x][cell.y] = 'snake'
-            })
+            _grid = initGrid();
         } else {
             _grid = JSON.parse(JSON.stringify(grid));
 
             _grid[food.x][food.y] = 'food';
-
             snake.forEach(cell => {
                 _grid[cell.x][cell.y] = 'snake'
             });
-            _grid[tail!.x][tail!.y] = 'blank'
+            if (tail) {
+                _grid[tail.x][tail.y] = 'blank'
+            }
         }
         setGrid(_grid);
     }
 
 
     useEffect(() => {
-        updateGrid();
+        if (!lost) {
+            updateGrid();
+        }
     }, [snake]);
 
     const handleDirectionChange = (dir: TDirection) => {
@@ -65,7 +91,6 @@ const Board = () => {
 
     const handleKeyDown = ({ key }: any) => {
         const direction = direactionRef.current;
-        console.log(key);
         switch (key) {
             case "ArrowDown":
                 if (direction !== "up") {
@@ -90,11 +115,39 @@ const Board = () => {
         }
     }
 
+    const endGame = (reason: string) => {
+        setStart(false);
+        setLost(true);
+        alert(`You lost!:( \nReason: ${reason || 'UNKOWN'}`);
+    }
+
+    const handleMoveSnake = () => {
+        const head = headRef.current;
+
+        if (head.x < 0 || head.y < 0) {
+            endGame(`head(${JSON.stringify(head)}) <= 0`);
+            return;
+        }
+        if (head.x >= size - 1 || head.y >= size - 1) {
+            endGame('head >= size - 1 ');
+            return;
+        }
+
+        console.log('head:', head, 'food:', food);
+        if (head.x === food.x && head.y === food.y) {
+            console.log('YUMMMY');
+            dispatch(spawnFood({ max: size }));
+            dispatch(moveSnake("food"));
+            return;
+        }
+        dispatch(moveSnake());
+    }
+
     useEffect(() => {
         let interval: any;
-        if (start) {
+        if (start && !lost) {
             interval = setInterval(() => {
-                dispatch(moveSnake());
+                handleMoveSnake()
             }, speed)
             window.addEventListener('keydown', handleKeyDown);
         }
@@ -104,6 +157,13 @@ const Board = () => {
         }
     }, [start, speed]);
 
+    const reset = () => {
+        dispatch(resetSnake());
+        setStart(false);
+        setGrid(initGrid());
+        setLost(false);
+    }
+
     return (
         <>
             <Grid
@@ -111,10 +171,13 @@ const Board = () => {
                 templateRows={`repeat(${size}, 1fr)`}
                 gap='2px'
                 p='8px'
-                border='1px'
                 w='min-content'
+                border='1px'
                 borderColor='whiteAlpha.700'
+                borderRadius={'2xl'}
+                boxShadow={lost ? 'rgba(229, 62, 62, 0.1) 0px 0px 20px 8px' : 'dark-lg'}
                 gridAutoFlow='column'
+                transition='all'
             >
                 {grid && grid.map((column, rK) => {
                     return column.map((cell, key) => (
@@ -122,22 +185,41 @@ const Board = () => {
                     ))
                 })}
             </Grid>
+            {JSON.stringify(snake)}
+            {JSON.stringify(food)}
             <Stack
                 direction='row'
                 spacing='12'
                 align='center'
                 mt={6}>
-                <Button
-                    onClick={() => setStart(!start)}
-                    minW={24}
-                >{start ? 'Stop' : 'Start'}</Button>
+                <Stack
+                    shouldWrapChildren
+                >
+                    <NumberInput
+                        size="lg"
+                        maxW={28}
+                        min={50}
+                        max={2000}
+                        step={50}
+                        defaultValue={speed}
+                        clampValueOnBlur={false}
+                        isDisabled
+                        onChange={(_, value) => setSpeed(value)}
+                    >
+                        <NumberInputField />
+                        <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                        </NumberInputStepper>
+                    </NumberInput>
+                </Stack>
                 <Stack>
                     <Flex justify='center'>
                         <IconButton
                             onClick={() => handleKeyDown({ key: 'ArrowUp' })}
                             aria-label='up'
                             isActive={direction === 'up'}
-                            disabled={!start}
+                            disabled={!start || lost}
                             icon={<ArrowUp />}
                         />
                     </Flex>
@@ -146,24 +228,40 @@ const Board = () => {
                             onClick={() => handleKeyDown({ key: 'ArrowLeft' })}
                             aria-label='left'
                             isActive={direction === 'left'}
-                            disabled={!start}
+                            disabled={!start || lost}
                             icon={<ArrowLeft />}
                         />
                         <IconButton
                             onClick={() => handleKeyDown({ key: 'ArrowDown' })}
                             aria-label='down'
                             isActive={direction === 'down'}
-                            disabled={!start}
+                            disabled={!start || lost}
                             icon={<ArrowDown />}
                         />
                         <IconButton
                             onClick={() => handleKeyDown({ key: 'ArrowRight' })}
                             aria-label='right'
                             isActive={direction === 'right'}
-                            disabled={!start}
+                            disabled={!start || lost}
                             icon={<ArrowRight />}
                         />
                     </Stack>
+                </Stack>
+                <Stack>
+                    <Button
+                        onClick={() => setStart(!start)}
+                        minW={24}
+                        disabled={lost}
+                        colorScheme={start ? 'red' : 'gray'}
+                    >
+                        {start ? 'Stop' : 'Start'}
+                    </Button>
+                    <Button
+                        onClick={() => reset()}
+                        minW={24}
+                    >
+                        Reset
+                    </Button>
                 </Stack>
             </Stack>
         </>
