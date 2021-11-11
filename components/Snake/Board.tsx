@@ -20,7 +20,7 @@ const Board = () => {
 
     const [grid, setGrid] = useState<TCell[][] | null>(null);
     const [size, setSize] = useState<number>(50);
-    const [speed, setSpeed] = useState<number>(1000);
+    const [speed, setSpeed] = useState<number>(369);
 
     const [start, setStart] = useState(false);
     const [lost, setLost] = useState(false);
