@@ -5,6 +5,7 @@ import {
     Grid,
     Button,
     Code,
+    Heading,
     IconButton,
     Stack,
     Flex,
@@ -41,8 +42,8 @@ const Board = () => {
     const direactionRef = useRef(direction);
 
     const [grid, setGrid] = useState<TCell[][] | null>(null);
-    const [size, setSize] = useState<number>(50);
-    const [speed, setSpeed] = useState<number>(100);
+    const [size, setSize] = useState<number>(30);
+    const [speed, setSpeed] = useState<number>(150);
 
     const [start, setStart] = useState(false);
     const [lost, setLost] = useState(false);
@@ -55,12 +56,15 @@ const Board = () => {
     }
 
     const initGrid = (): TCell[][] => {
-        console.log('INIT');
+        const food = foodRef.current;
 
         let _grid: TCell[][] = Array.from({ length: size }, () => Array.from({ length: size }, () => "blank"))
 
-        // dispatch(spawnFood({ max: size }));
-        _grid[food.x][food.y] = 'food';
+        if (!food.x || !food.y) {
+            dispatch(spawnFood({ max: size }));
+        }
+        if (food.x && food.y)
+            _grid[food.x][food.y] = 'food';
 
         // snake.forEach(cell => {  // FIX: Hardcoded, snake is falling one step behind
         [{ x: 0, y: 0 }, { x: 1, y: 0 }].forEach(cell => {
@@ -196,6 +200,11 @@ const Board = () => {
         setLost(false);
     }
 
+    const handleSizeChange = (value: number) => {
+        setSize(value);
+        reset();
+    }
+
     return (
         <Stack
             direction={{ base: 'column', lg: 'row' }}
@@ -229,6 +238,7 @@ const Board = () => {
                 align='center'
                 justify='flex-end'
                 mt={6}>
+                <Heading size='lg'> Score: {snake.length}</Heading>
                 <Stack
                     shouldWrapChildren
                 >
@@ -242,6 +252,23 @@ const Board = () => {
                         clampValueOnBlur={false}
                         isDisabled
                         onChange={(_, value) => setSpeed(value)}
+                    >
+                        <NumberInputField />
+                        <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                        </NumberInputStepper>
+                    </NumberInput>
+                    <NumberInput
+                        size="lg"
+                        maxW={28}
+                        min={3}
+                        max={100}
+                        step={5}
+                        defaultValue={size}
+                        clampValueOnBlur={false}
+                        isDisabled={start}
+                        onChange={(_, value) => handleSizeChange(value)}
                     >
                         <NumberInputField />
                         <NumberInputStepper>

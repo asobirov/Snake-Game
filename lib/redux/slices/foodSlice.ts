@@ -6,12 +6,10 @@ type TSpawFood = {
   grid?: TCell[][];
 };
 
-function initFoodCoords(): TCoordinates {
-  let min = Math.ceil(0);
-  let max = Math.floor(50);
+function initFoodCoords(): any {
   return {
-    x: Math.floor(Math.random() * (max - min + 1) + min),
-    y: Math.floor(Math.random() * (max - min + 1) + min),
+    x: null,
+    y: null,
   };
 }
 
